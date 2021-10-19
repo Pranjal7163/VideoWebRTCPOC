@@ -46,6 +46,13 @@ navigator.mediaDevices
       });
     });
 
+    peer.on('disconnected', function () {
+      console.log('Connection lost. Please reconnect');
+    });
+    peer.on('close', function () {      
+        console.log('Connection destroyed');
+    });
+
     socket.on("user-connected", (userId) => {
       connectToNewUser(userId, stream);
     });
