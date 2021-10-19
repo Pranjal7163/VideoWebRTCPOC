@@ -42,21 +42,29 @@
 .videos__group {
   flex-grow: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 1rem;
   background-color: var(--main-dark);
 }
 
-video {
-  height: 300px;
+.addvideo {
+  height: 150px;
   border-radius: 1rem;
   margin: 0.5rem;
-  width: 400px;
+  width: 250px;
   object-fit: cover;
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
+}
+
+.newvideo {
+  position: fixed;
+  right: 0;
+  top: 0;
+height: 100%;
+width: 100%;
+object-fit: contain;
+background: #2c3e50;
 }
 
 .options {
@@ -154,7 +162,6 @@ video {
 
 #video-grid {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
 }
 

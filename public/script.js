@@ -1,6 +1,6 @@
 const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
-const myVideo = document.createElement("video");
+const myVideo = document.querySelector(".newvideo");
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
 myVideo.muted = true;
@@ -35,7 +35,7 @@ navigator.mediaDevices
   })
   .then((stream) => {
     myVideoStream = stream;
-    addVideoStream(myVideo, stream);
+    addVideoStreamWithoutGrid(myVideo, stream);
 
     peer.on("call", (call) => {
       call.answer(stream);
@@ -53,6 +53,7 @@ navigator.mediaDevices
 const connectToNewUser = (userId, stream) => {
   const call = peer.call(userId, stream);
   const video = document.createElement("video");
+  video.className = "addvideo"
   call.on("stream", (userVideoStream) => {
     addVideoStream(video, userVideoStream);
   });
@@ -67,6 +68,14 @@ const addVideoStream = (video, stream) => {
   video.addEventListener("loadedmetadata", () => {
     video.play();
     videoGrid.append(video);
+  });
+};
+
+const addVideoStreamWithoutGrid = (video, stream) => {
+  video.srcObject = stream;
+  video.addEventListener("loadedmetadata", () => {
+    video.play();
+    // videoGrid.append(video);
   });
 };
 
