@@ -29,12 +29,12 @@
 
 .main {
   overflow: hidden;
-  height: 100vh;
+  height: 92vh;
   display: flex;
 }
 
 .main__left {
-  flex: 1;
+  flex: 0.7;
   display: flex;
   flex-direction: column;
 }
@@ -46,16 +46,6 @@
   align-items: center;
   padding: 1rem;
   background-color: var(--main-dark);
-}
-
-.newvideo {
-  position: fixed;
-  right: 0;
-  top: 0;
-  height: 100%;
-  width: 100%;
-  object-fit: contain;
-  background: #2c3e50;
 }
 
 video {
@@ -103,7 +93,7 @@ video {
 .main__right {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 0.3;
   background-color: #242f41;
 }
 
@@ -164,7 +154,7 @@ video {
 
 #video-grid {
   display: flex;
-  float: left;
+  justify-content: center;
   flex-wrap: wrap;
 }
 
