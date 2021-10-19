@@ -34,6 +34,7 @@ navigator.mediaDevices
     video: true,
   })
   .then((stream) => {
+    console.log("Start");
     myVideoStream = stream;
     addVideoStreamWithoutGrid(myVideo, stream);
 
