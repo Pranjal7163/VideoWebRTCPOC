@@ -48,6 +48,9 @@ navigator.mediaDevices
     socket.on("user-connected", (userId) => {
       connectToNewUser(userId, stream);
     });
+    socket.on("user-disconnected", (userId)=>{
+      console.log("disconnect");
+ });
   });
 
 const connectToNewUser = (userId, stream) => {
