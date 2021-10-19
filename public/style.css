@@ -164,7 +164,7 @@ video {
 
 #video-grid {
   display: flex;
-  justify-content: center;
+  float: left;
   flex-wrap: wrap;
 }
 
