@@ -29,12 +29,12 @@
 
 .main {
   overflow: hidden;
-  height: 92vh;
+  height: 100vh;
   display: flex;
 }
 
 .main__left {
-  flex: 0.7;
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -46,6 +46,16 @@
   align-items: center;
   padding: 1rem;
   background-color: var(--main-dark);
+}
+
+.newvideo {
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  background: #2c3e50;
 }
 
 video {
@@ -93,7 +103,7 @@ video {
 .main__right {
   display: flex;
   flex-direction: column;
-  flex: 0.3;
+  flex: 1;
   background-color: #242f41;
 }
 
