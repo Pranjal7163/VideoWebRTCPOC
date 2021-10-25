@@ -128,6 +128,7 @@ endCall.onclick = async () => {
 };
 
 peer.on("open", (id) => {
+  console.log("OPEN");
   socket.emit("join-room", ROOM_ID, id, user);
 });
 
