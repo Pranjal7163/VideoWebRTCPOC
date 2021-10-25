@@ -26,6 +26,10 @@ app.get("/:room", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("connected");
+  setTimeout(function(){
+    console.log("socket timer");
+    console.log( socket.client.conn.server.clientsCount + " users connected" );
+  },1000)
   socket.on('disconnect', function () {
     console.log(socket.id);
   });
