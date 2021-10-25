@@ -3,6 +3,10 @@ const videoGrid = document.getElementById("video-grid");
 const myVideo = document.querySelector(".newvideo");
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
+
+let selfStream = null;
+let userStream = null;
+let recorder = null;
 myVideo.muted = true;
 
 backBtn.addEventListener("click", () => {
@@ -36,6 +40,7 @@ navigator.mediaDevices
   .then((stream) => {
     console.log("Start");
     myVideoStream = stream;
+    selfStream = stream;
     addVideoStreamWithoutGrid(myVideo, stream);
 
     peer.on("call", (call) => {
@@ -43,6 +48,8 @@ navigator.mediaDevices
       const video = document.createElement("video");
       video.className = "addvideo"
       call.on("stream", (userVideoStream) => {
+        userStream = userVideoStream;
+        startRecording();
         addVideoStream(video, userVideoStream);
       });
     });
@@ -62,6 +69,7 @@ navigator.mediaDevices
   });
 
     socket.on("user-connected", (userId) => {
+      console.log(userId);
       connectToNewUser(userId, stream);
     });
     socket.on("user-disconnected", (userId)=>{
@@ -74,9 +82,26 @@ const connectToNewUser = (userId, stream) => {
   const video = document.createElement("video");
   video.className = "addvideo"
   call.on("stream", (userVideoStream) => {
+    userStream = userVideoStream;
+    startRecording();
     addVideoStream(video, userVideoStream);
   });
 };
+
+function startRecording(){
+  var streamsList = [selfStream, userStream];
+            const mixer = new MultiStreamsMixer(streamsList);
+            mixer.startDrawingFrames();
+            const mixedStream = mixer.getMixedStream();
+            recorder = RecordRTC(mixedStream, {
+                type: "video",
+                mimeType: "video/webm",
+                previewStream: function (s) {
+                  
+                }
+              });
+              recorder.startRecording();
+}
 
 peer.on("open", (id) => {
   socket.emit("join-room", ROOM_ID, id, user);

@@ -57,6 +57,26 @@
   -moz-transform: rotateY(180deg);
 }
 
+.content {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  height: 80px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #f1f1f1;
+  width: 100%;
+}
+
+.btn {
+  display:block;
+  height: 60px;
+  width: 60px;
+  border-radius: 50%;
+  color: red;
+  border: 1px solid red;
+  
+}
+
 .newvideo {
   position: fixed;
   right: 0;
