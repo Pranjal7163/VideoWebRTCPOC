@@ -3,11 +3,13 @@ const videoGrid = document.getElementById("video-grid");
 const myVideo = document.querySelector(".newvideo");
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
+const endCall = document.getElementById('endCall');
 
 let selfStream = null;
 let userStream = null;
 let recorder = null;
 myVideo.muted = true;
+
 
 backBtn.addEventListener("click", () => {
   document.querySelector(".main__left").style.display = "flex";
@@ -102,6 +104,28 @@ function startRecording(){
               });
               recorder.startRecording();
 }
+
+function downloadFile(){
+   
+  recorder.stopRecording(() => {
+      var blob = recorder.getBlob();
+      const url = URL.createObjectURL(blob);
+      console.log(url);
+      let a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = "local.webm";
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);        
+    });
+};
+
+
+endCall.onclick = async () => {
+  console.log('hangupCalled');  
+  downloadFile();
+};
 
 peer.on("open", (id) => {
   socket.emit("join-room", ROOM_ID, id, user);
