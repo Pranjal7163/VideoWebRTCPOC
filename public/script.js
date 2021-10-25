@@ -54,6 +54,12 @@ navigator.mediaDevices
         console.log('Connection destroyed');
     });
 
+    socket.on('connection', function (socket) {
+      socket.on('disconnect', function () {
+          console.log(socket.id);
+      });
+  });
+
     socket.on("user-connected", (userId) => {
       connectToNewUser(userId, stream);
     });
