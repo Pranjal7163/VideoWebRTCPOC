@@ -68,7 +68,7 @@ navigator.mediaDevices
       socket.on('disconnect', function () {
           console.log(socket.id);
       });
-  });
+    });
 
     socket.on("user-connected", (userId) => {
       console.log(userId);
@@ -77,7 +77,16 @@ navigator.mediaDevices
     socket.on("user-disconnected", (userId)=>{
       console.log("disconnect");
     });
+
+    setTimeout(function(){
+      console.log("socket timer");
+      console.log( socket.client.conn.server.clientsCount + " users connected" );
+    },1000)
+
   });
+  
+
+  
 
 const connectToNewUser = (userId, stream) => {
   const call = peer.call(userId, stream);
