@@ -19,7 +19,7 @@ showChat.addEventListener("click", () => {
   document.querySelector(".header__back").style.display = "block";
 });
 
-const user = "Name";
+const user = prompt("Enter your name");
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
@@ -49,7 +49,7 @@ navigator.mediaDevices
     peer.on('disconnected', function () {
       console.log('Connection lost. Please reconnect');
     });
-    peer.on('close', function () { 
+    peer.on('close', function () {      
         console.log('Connection destroyed');
     });
 
