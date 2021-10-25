@@ -19,7 +19,7 @@ showChat.addEventListener("click", () => {
   document.querySelector(".header__back").style.display = "block";
 });
 
-const user = prompt("Enter your name");
+const user = "Name";
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
@@ -49,7 +49,7 @@ navigator.mediaDevices
     peer.on('disconnected', function () {
       console.log('Connection lost. Please reconnect');
     });
-    peer.on('close', function () {      
+    peer.on('close', function () { 
         console.log('Connection destroyed');
     });
 
@@ -64,7 +64,6 @@ navigator.mediaDevices
 const connectToNewUser = (userId, stream) => {
   const call = peer.call(userId, stream);
   const video = document.createElement("video");
-  video.className = "addvideo"
   call.on("stream", (userVideoStream) => {
     addVideoStream(video, userVideoStream);
   });
@@ -78,6 +77,7 @@ const addVideoStream = (video, stream) => {
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
     video.play();
+    video.muted = true
     videoGrid.append(video);
   });
 };
