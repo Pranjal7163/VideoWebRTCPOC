@@ -9,10 +9,10 @@ const io = require("socket.io")(server, {
   }
 });
 
-io.configure(function () { 
-  io.set("transports", ["xhr-polling"]); 
-  io.set("polling duration", 10); 
-});
+// io.configure(function () { 
+//   io.set("transports", ["xhr-polling"]); 
+//   io.set("polling duration", 10); 
+// });
 
 const { ExpressPeerServer } = require("peer");
 const peerServer = ExpressPeerServer(server, {
