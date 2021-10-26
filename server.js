@@ -28,10 +28,11 @@ io.on("connection", (socket) => {
   console.log("connected");
   setTimeout(function(){
     console.log("socket timer");
-    console.log( socket.client.conn.server.clientsCount + " users connected" );
+    console.log(io.sockets.sockets.length);
   },1000)
   socket.on('disconnect', function () {
-    console.log(socket.id);
+    console.log("disconnect");
+    console.log(socket.id);    
   });
   socket.on("join-room", (roomId, userId, userName) => {
     socket.join(roomId);

@@ -67,6 +67,7 @@ navigator.mediaDevices
       console.log('a user connected');
       socket.on('disconnect', function () {
           console.log(socket.id);
+          prompt("Disconnected");
       });
     });
 
@@ -75,14 +76,13 @@ navigator.mediaDevices
       connectToNewUser(userId, stream);
     });
     socket.on("user-disconnected", (userId)=>{
-      console.log("disconnect");
+      console.log("disconnect-user");
+      prompt("Disconnected User");
     });
 
-    setTimeout(function(){
-      console.log("socket timer");
-      console.log( socket.client.conn.server.clientsCount + " users connected" );
-    },1000)
-
+    window.addEventListener('beforeunload', function () {
+      
+  }, false);
   });
   
 
