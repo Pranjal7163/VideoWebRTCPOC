@@ -33,13 +33,14 @@ app.get("/:room", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log("connected");
-  
+
   setTimeout(function(){
     console.log("socket timer");
     console.log(io.sockets.sockets.length);
   },1000)
 
   socket.on("disconnect", (reason)=>{
+    console.log("disconnect");
     socket.broadcast.emit("user-disconnected"); 
 });
   // socket.on('disconnect', function () {
