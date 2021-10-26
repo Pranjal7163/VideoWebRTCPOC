@@ -81,7 +81,7 @@ navigator.mediaDevices
     });
 
     window.addEventListener('beforeunload', function () {
-      
+      socket.emit("message", "disconnect");
   }, false);
   });
   
@@ -217,6 +217,9 @@ inviteButton.addEventListener("click", (e) => {
 });
 
 socket.on("createMessage", (message, userName) => {
+  if(message == "disconnect"){
+    prompt("Disconnected");
+  }
   messages.innerHTML =
     messages.innerHTML +
     `<div class="message">
