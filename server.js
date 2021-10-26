@@ -8,6 +8,12 @@ const io = require("socket.io")(server, {
     origin: '*'
   }
 });
+
+io.configure(function () { 
+  io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10); 
+});
+
 const { ExpressPeerServer } = require("peer");
 const peerServer = ExpressPeerServer(server, {
   debug: true,
@@ -23,6 +29,7 @@ app.get("/", (req, res) => {
 app.get("/:room", (req, res) => {
   res.render("room", { roomId: req.params.room });
 });
+
 
 io.on("connection", (socket) => {
   console.log("connected");
