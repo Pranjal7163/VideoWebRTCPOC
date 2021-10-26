@@ -79,7 +79,7 @@ navigator.mediaDevices
     socket.on("user-disconnected", (userId)=>{
       console.log("disconnect-user");
       prompt("Disconnected User");
-      reset();
+      location.href = "/close"
     });
 
     window.addEventListener('beforeunload', function () {
