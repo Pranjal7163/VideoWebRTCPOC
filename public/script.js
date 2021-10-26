@@ -75,13 +75,15 @@ navigator.mediaDevices
       console.log(userId);
       connectToNewUser(userId, stream);
     });
+
     socket.on("user-disconnected", (userId)=>{
       console.log("disconnect-user");
       prompt("Disconnected User");
+      reset();
     });
 
     window.addEventListener('beforeunload', function () {
-      socket.emit("message", "disconnect");
+      socket.emit("disconnect");
   }, false);
   });
   
@@ -140,6 +142,10 @@ peer.on("open", (id) => {
   console.log("OPEN");
   socket.emit("join-room", ROOM_ID, id, user);
 });
+
+function reset() {
+  videoGrid.forEach((e) => e.parentNode.removeChild(e));
+}
 
 const addVideoStream = (video, stream) => {
   video.srcObject = stream;
