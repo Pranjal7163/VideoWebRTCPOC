@@ -38,7 +38,7 @@ io.on("connection", (socket) => {
     console.log(io.sockets.sockets.length);
   },1000)
   socket.on("disconnect", (reason)=>{
-    socket.broadcast.emit("user-disconnected", userId); 
+    socket.broadcast.emit("user-disconnected"); 
 });
   // socket.on('disconnect', function () {
   //   console.log("disconnect");
