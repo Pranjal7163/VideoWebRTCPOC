@@ -10,6 +10,8 @@ let userStream = null;
 let recorder = null;
 myVideo.muted = true;
 
+var myUserId = null;
+var roomId = null;
 
 backBtn.addEventListener("click", () => {
   document.querySelector(".main__left").style.display = "flex";
@@ -85,7 +87,7 @@ navigator.mediaDevices
     
 
     window.addEventListener('beforeunload', function () {
-      socket.emit("disconnect");
+      socket.emit("message", myUserId);
   }, false);
   });
   
@@ -142,7 +144,11 @@ endCall.onclick = async () => {
 
 peer.on("open", (id) => {
   console.log("OPEN");
-  socket.emit("join-room", ROOM_ID, id, user);
+  myUserId = id;
+  console.log("myUserID "+id);
+  var roomIdLocal = ROOM_ID;
+  roomId = roomIdLocal;
+  socket.emit("join-room", roomId, id, user);
 });
 
 function reset() {

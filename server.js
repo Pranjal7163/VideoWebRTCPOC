@@ -58,6 +58,7 @@ io.on("connection", (socket) => {
     socket.join(roomId);
     socket.to(roomId).broadcast.emit("user-connected", userId);
     socket.on("message", (message) => {
+      console.log("room-id"+roomId);
       io.to(roomId).emit("createMessage", message, userName);
     });
   });
