@@ -43,10 +43,11 @@ io.on("connection", (socket) => {
 //     console.log("disconnect");
 //     socket.broadcast.emit("user-disconnected"); 
 // });
-  // socket.on('disconnect', function () {
-  //   console.log("disconnect");
-  //   console.log(socket.id);    
-  // });
+  socket.on('disconnect',  (roomId) => {
+    console.log("disconnect");
+    console.log("room-id"+roomId);
+    console.log(socket.id);
+  });
 
   socket.on("leave-room", (roomId , userId) => {
     socket.to(roomId).broadcast.emit("user-disconnected", userId);
