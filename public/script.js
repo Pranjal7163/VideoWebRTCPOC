@@ -25,7 +25,7 @@ showChat.addEventListener("click", () => {
   document.querySelector(".header__back").style.display = "block";
 });
 
-const user = prompt("Enter your name");
+const user = makeid(6);
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
@@ -78,8 +78,10 @@ navigator.mediaDevices
 
     socket.on("user-disconnected", (userId)=>{
       console.log("disconnect-user");
+      console.log(userId);
       location.href = "/close/done"
     });
+    
 
     window.addEventListener('beforeunload', function () {
       socket.emit("disconnect");
@@ -162,6 +164,18 @@ const addVideoStreamWithoutGrid = (video, stream) => {
     // videoGrid.append(video);
   });
 };
+
+function makeid(length) {
+  var result           = '';
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * 
+charactersLength));
+ }
+ return result;
+}
+
 
 let text = document.querySelector("#chat_message");
 let send = document.getElementById("send");

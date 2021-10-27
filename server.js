@@ -39,15 +39,21 @@ io.on("connection", (socket) => {
     console.log(io.sockets.sockets.length);
   },1000)
 
-  socket.on("disconnect", (reason)=>{
-    console.log("disconnect");
-    socket.broadcast.emit("user-disconnected"); 
-});
+//   socket.on("disconnect", (reason)=>{
+//     console.log("disconnect");
+//     socket.broadcast.emit("user-disconnected"); 
+// });
   // socket.on('disconnect', function () {
   //   console.log("disconnect");
   //   console.log(socket.id);    
   // });
+
+  socket.on("leave-room", (roomId , userId) => {
+    socket.to(roomId).broadcast.emit("user-disconnected", userId);
+  });
+
   socket.on("join-room", (roomId, userId, userName) => {
+    console.log("room-id"+roomId);
     socket.join(roomId);
     socket.to(roomId).broadcast.emit("user-connected", userId);
     socket.on("message", (message) => {
