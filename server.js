@@ -57,6 +57,10 @@ io.on("connection", (socket) => {
     console.log("room-id"+roomId);
     socket.join(roomId);
     socket.to(roomId).broadcast.emit("user-connected", userId);
+    socket.on('disconnect', function(){
+      console.log("messageDisconnection");
+      socket.broadcast.to(roomId).emit("user-disconnected", userName);
+  });
     socket.on("message", (message) => {
       console.log("room-id"+roomId);
       io.to(roomId).emit("createMessage", message, userName);
