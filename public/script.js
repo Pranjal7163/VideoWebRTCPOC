@@ -126,8 +126,10 @@ function startRecording(){
     	// create local object URL from the recorded video blobs
     	// let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
     	// download_link.href = video_local;
-      // blobs_recorded.forEach(blob => {
-        const url = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
+      blobs_recorded.forEach(blob => {
+        let single_blob_array = [];
+        single_blob_array.push(blob);
+        const url = URL.createObjectURL(new Blob(single_blob_array, { type: 'video/webm' }));
         console.log(url);
         let a = document.createElement("a");
         a.style.display = "none";
@@ -136,7 +138,7 @@ function startRecording(){
         a.click();
         a.remove();
         URL.revokeObjectURL(url); 
-      // })
+      })
 
     });
 
