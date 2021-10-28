@@ -13,6 +13,9 @@ myVideo.muted = true;
 var myUserId = null;
 var roomId = null;
 
+let media_recorder = null;
+let blobs_recorded = [];
+
 backBtn.addEventListener("click", () => {
   document.querySelector(".main__left").style.display = "flex";
   document.querySelector(".main__left").style.flex = "1";
@@ -83,7 +86,9 @@ navigator.mediaDevices
       console.log("disconnect-user");
       console.log("Recieved Room ID",roomIdRecieved);
       console.log("My Room ID",roomId);
-      location.href = "/close/done"
+      if(roomIdRecieved == roomId){
+        location.href = "/close/done"
+      }
     });
     
 
@@ -107,34 +112,67 @@ const connectToNewUser = (userId, stream) => {
 };
 
 function startRecording(){
-  var streamsList = [selfStream, userStream];
-            const mixer = new MultiStreamsMixer(streamsList);
-            mixer.startDrawingFrames();
-            const mixedStream = mixer.getMixedStream();
-            recorder = RecordRTC(mixedStream, {
-                type: "video",
-                mimeType: "video/webm",
-                previewStream: function (s) {
+  media_recorder = new MediaRecorder(selfStream, { mimeType: 'video/webm' });
+
+    // event : new recorded video blob available 
+    media_recorder.addEventListener('dataavailable', function(e) {
+      console.log("blob recieved");
+		  blobs_recorded.push(e.data);
+    });
+
+    // event : recording stopped & all blobs sent
+    media_recorder.addEventListener('stop', function() {
+      console.log("stopped");
+    	// create local object URL from the recorded video blobs
+    	// let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
+    	// download_link.href = video_local;
+      blobs_recorded.forEach(blob => {
+        const url = URL.createObjectURL(blob);
+        console.log(url);
+        let a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "local.webm";
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url); 
+      })
+
+    });
+
+    // start recording with each recorded blob having 1 second video
+    console.log("starting");
+    media_recorder.start(5000);
+
+  // var streamsList = [selfStream, userStream];
+  //           const mixer = new MultiStreamsMixer(streamsList);
+  //           mixer.startDrawingFrames();
+  //           const mixedStream = mixer.getMixedStream();
+  //           recorder = RecordRTC(mixedStream, {
+  //               type: "video",
+  //               mimeType: "video/webm",
+  //               previewStream: function (s) {
                   
-                }
-              });
-              recorder.startRecording();
+  //               }
+  //             });
+  //             recorder.startRecording();
 }
 
 function downloadFile(){
-   
-  recorder.stopRecording(() => {
-      var blob = recorder.getBlob();
-      const url = URL.createObjectURL(blob);
-      console.log(url);
-      let a = document.createElement("a");
-      a.style.display = "none";
-      a.href = url;
-      a.download = "local.webm";
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);        
-    });
+  console.log("download");
+  media_recorder.stop(); 
+  // recorder.stopRecording(() => {
+  //     var blob = recorder.getBlob();
+  //     const url = URL.createObjectURL(blob);
+  //     console.log(url);
+  //     let a = document.createElement("a");
+  //     a.style.display = "none";
+  //     a.href = url;
+  //     a.download = "local.webm";
+  //     a.click();
+  //     a.remove();
+  //     URL.revokeObjectURL(url);        
+  //   });
 };
 
 
