@@ -79,9 +79,10 @@ navigator.mediaDevices
       connectToNewUser(userId, stream);
     });
 
-    socket.on("user-disconnected", (userId)=>{
+    socket.on("user-disconnected", (roomIdRecieved)=>{
       console.log("disconnect-user");
-      console.log(userId);
+      console.log("Recieved Room ID",roomIdRecieved);
+      console.log("My Room ID",roomId);
       location.href = "/close/done"
     });
     
@@ -148,6 +149,7 @@ peer.on("open", (id) => {
   console.log("myUserID "+id);
   var roomIdLocal = ROOM_ID;
   roomId = roomIdLocal;
+  console.log("roomId "+roomId);
   socket.emit("join-room", roomId, id, user);
 });
 
