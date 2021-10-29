@@ -127,8 +127,8 @@ function startRecording(){
     	// let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
     	// download_link.href = video_local;
       // blobs_recorded.forEach(blob => {
-        let single_blob_array = [];
-        single_blob_array.push(blob);
+        // let single_blob_array = [];
+        // single_blob_array.push(blob);
         const url = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
         console.log(url);
         let a = document.createElement("a");
