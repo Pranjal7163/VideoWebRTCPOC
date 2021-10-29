@@ -106,12 +106,22 @@ const connectToNewUser = (userId, stream) => {
   video.className = "addvideo"
   call.on("stream", (userVideoStream) => {
     userStream = userVideoStream;
-    startRecording();
+    
+    (function(){
+      var f = function() {
+        downloadFile();
+        startRecording();
+      };
+      window.setInterval(f, 10000);
+      f();
+   })();
+   
     addVideoStream(video, userVideoStream);
   });
 };
 
 function startRecording(){
+  blobs_recorded = [];
   media_recorder = new MediaRecorder(selfStream, { mimeType: 'video/webm' });
 
     // event : new recorded video blob available 
@@ -144,7 +154,7 @@ function startRecording(){
 
     // start recording with each recorded blob having 1 second video
     console.log("starting");
-    media_recorder.start(5000);
+    media_recorder.start(1000);
 
   // var streamsList = [selfStream, userStream];
   //           const mixer = new MultiStreamsMixer(streamsList);
