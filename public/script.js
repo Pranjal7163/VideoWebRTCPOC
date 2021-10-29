@@ -118,6 +118,17 @@ function startRecording(){
     media_recorder.addEventListener('dataavailable', function(e) {
       console.log("blob recieved");
 		  blobs_recorded.push(e.data);
+        let single_blob_array = [];
+        single_blob_array.push(e.data);
+        const url = URL.createObjectURL(new Blob(single_blob_array, { type: 'video/webm' }));
+        console.log(url);
+        let a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "local.webm";
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url); 
     });
 
     // event : recording stopped & all blobs sent
