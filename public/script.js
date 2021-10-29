@@ -141,16 +141,7 @@ function startRecording(){
     	// download_link.href = video_local;
       // blobs_recorded.forEach(blob => {
         // let single_blob_array = [];
-        // single_blob_array.push(blob);
-        const url = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
-        console.log(url);
-        let a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-        a.download = "local.webm";
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url); 
+        // single_blob_array.push(blob);        
       // })
 
     });
@@ -177,6 +168,15 @@ function startRecording(){
 function downloadFile(){
   console.log("download");
   media_recorder.stop(); 
+  const url = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
+        console.log(url);
+        let a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "local.webm";
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url); 
   // recorder.stopRecording(() => {
   //     var blob = recorder.getBlob();
   //     const url = URL.createObjectURL(blob);
