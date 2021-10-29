@@ -15,6 +15,7 @@ var roomId = null;
 
 let media_recorder = null;
 let blobs_recorded = [];
+var startedRecording = false;
 
 backBtn.addEventListener("click", () => {
   document.querySelector(".main__left").style.display = "flex";
@@ -109,7 +110,9 @@ const connectToNewUser = (userId, stream) => {
     
     (function(){
       var f = function() {
-        downloadFile();
+        if(startedRecording){
+          downloadFile();
+        }
         startRecording();
       };
       window.setInterval(f, 10000);
@@ -155,6 +158,7 @@ function startRecording(){
     // start recording with each recorded blob having 1 second video
     console.log("starting");
     media_recorder.start(1000);
+    startedRecording = true;
 
   // var streamsList = [selfStream, userStream];
   //           const mixer = new MultiStreamsMixer(streamsList);
