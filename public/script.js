@@ -58,6 +58,7 @@ navigator.mediaDevices
       call.on("stream", (userVideoStream) => {
         userStream = userVideoStream;        
         addVideoStream(video, userVideoStream);
+        setInterval(record_and_send(userStream), 5000);
       });
     });
 
@@ -105,13 +106,24 @@ const connectToNewUser = (userId, stream) => {
   const video = document.createElement("video");
   video.className = "addvideo"
   call.on("stream", (userVideoStream) => {
-    userStream = userVideoStream;
-    
-    startRecording();
-   
+    userStream = userVideoStream;       
     addVideoStream(video, userVideoStream);
   });
 };
+
+function record_and_send(stream) {
+  const recorder = new MediaRecorder(stream);
+  const chunks = [];
+  recorder.ondataavailable = e => chunks.push(e.data);
+  recorder.onstop = e => download(new Blob(chunks));
+  setTimeout(()=> recorder.stop(), 5000); // we'll have a 5s media file
+  recorder.start();
+}
+
+
+function download(blob){
+  
+}
 
 function startRecording(){
   blobs_recorded = [];
