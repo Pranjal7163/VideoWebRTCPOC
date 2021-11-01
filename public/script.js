@@ -129,15 +129,15 @@ function startRecording(){
       var file = new File([blob], 'msr-' + (new Date).toISOString().replace(/:|\./g, '-') + '.webm', {
         type: 'video/webm'
       });
-      const url = window.URL.createObjectURL(blob.data);
-      console.log(url);
-      let a = document.createElement("a");
-      a.style.display = "none";
-      a.href = url;
-      a.download = "local.webm";
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);   
+        const url = URL.createObjectURL(new Blob(blob, { type: 'video/webm' }));
+        console.log(url);
+        let a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "local.webm";
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);  
   };
 
     // event : recording stopped & all blobs sent
