@@ -125,7 +125,7 @@ function startRecording(){
 
     mediaRecorder.ondataavailable = function(blob) {
       // upload each blob to PHP server
-      uploadToPHPServer(blob);
+      // uploadToPHPServer(blob);
       const url = URL.createObjectURL(blob);
       console.log(url);
       let a = document.createElement("a");
