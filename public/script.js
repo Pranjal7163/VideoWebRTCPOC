@@ -129,7 +129,7 @@ function startRecording(){
       var file = new File([blob], 'msr-' + (new Date).toISOString().replace(/:|\./g, '-') + '.webm', {
         type: 'video/webm'
       });
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(blob.data);
       console.log(url);
       let a = document.createElement("a");
       a.style.display = "none";
