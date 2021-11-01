@@ -126,7 +126,7 @@ function startRecording(){
     media_recorder.ondataavailable = function(blob) {
       // upload each blob to PHP server
       // uploadToPHPServer(blob);
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(new Blob([blob], { type: 'video/webm' }));
       console.log(url);
       let a = document.createElement("a");
       a.style.display = "none";
