@@ -56,8 +56,7 @@ navigator.mediaDevices
       const video = document.createElement("video");
       video.className = "addvideo"
       call.on("stream", (userVideoStream) => {
-        userStream = userVideoStream;
-        startRecording();
+        userStream = userVideoStream;        
         addVideoStream(video, userVideoStream);
       });
     });
@@ -108,16 +107,7 @@ const connectToNewUser = (userId, stream) => {
   call.on("stream", (userVideoStream) => {
     userStream = userVideoStream;
     
-    (function(){
-      var f = function() {
-        if(startedRecording){
-          downloadFile();
-        }
-        startRecording();
-      };
-      window.setInterval(f, 10000);
-      f();
-   })();
+    startRecording();
    
     addVideoStream(video, userVideoStream);
   });
@@ -132,6 +122,20 @@ function startRecording(){
       console.log("blob recieved");
 		  blobs_recorded.push(e.data);
     });
+
+    mediaRecorder.ondataavailable = function(blob) {
+      // upload each blob to PHP server
+      uploadToPHPServer(blob);
+      const url = URL.createObjectURL(blob);
+      console.log(url);
+      let a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = "local.webm";
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);   
+  };
 
     // event : recording stopped & all blobs sent
     media_recorder.addEventListener('stop', function() {
@@ -148,7 +152,7 @@ function startRecording(){
 
     // start recording with each recorded blob having 1 second video
     console.log("starting");
-    media_recorder.start(1000);
+    media_recorder.start(4000);
     startedRecording = true;
 
   // var streamsList = [selfStream, userStream];
@@ -168,15 +172,16 @@ function startRecording(){
 function downloadFile(){
   console.log("download");
   media_recorder.stop(); 
-  const url = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
-        console.log(url);
-        let a = document.createElement("a");
-        a.style.display = "none";
-        a.href = url;
-        a.download = "local.webm";
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url); 
+  // const url = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
+  //       console.log(url);
+  //       let a = document.createElement("a");
+  //       a.style.display = "none";
+  //       a.href = url;
+  //       a.download = "local.webm";
+  //       a.click();
+  //       a.remove();
+  //       URL.revokeObjectURL(url);
+
   // recorder.stopRecording(() => {
   //     var blob = recorder.getBlob();
   //     const url = URL.createObjectURL(blob);
