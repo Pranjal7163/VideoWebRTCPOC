@@ -123,7 +123,7 @@ function startRecording(){
 		  blobs_recorded.push(e.data);
     });
 
-    mediaRecorder.ondataavailable = function(blob) {
+    media_recorder.ondataavailable = function(blob) {
       // upload each blob to PHP server
       // uploadToPHPServer(blob);
       const url = URL.createObjectURL(blob);
