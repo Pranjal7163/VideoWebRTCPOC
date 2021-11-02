@@ -30,6 +30,10 @@ app.get("/:room", (req, res) => {
   res.render("room", { roomId: req.params.room });
 });
 
+app.get("/agent/:room", (req, res) => {
+  res.render("agent", { roomId: req.params.room });
+});
+
 
 io.on("connection", (socket) => {
   console.log("connected");

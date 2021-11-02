@@ -33,10 +33,11 @@ showChat.addEventListener("click", () => {
 
 const user = makeid(6);
 
-var peer = new Peer(undefined, {
-  path: "/peerjs",
-  host: "/",
-  port: "443",
+var peer = new Peer({
+  config: {'iceServers': [
+    { url: 'stun:stun.l.google.com:19302' },
+    { url: 'turn:homeo@turn.bistri.com:80', credential: 'homeo' }
+  ]} /* Sample servers, please use appropriate ones */
 });
 
 let myVideoStream;
@@ -49,16 +50,16 @@ navigator.mediaDevices
     console.log("Start");
     myVideoStream = stream;
     selfStream = stream;
+    
     addVideoStreamWithoutGrid(myVideo, stream);
-
+    setInterval(record_and_send, 5000);
     peer.on("call", (call) => {
       call.answer(stream);
       const video = document.createElement("video");
       video.className = "addvideo"
       call.on("stream", (userVideoStream) => {
         userStream = userVideoStream;        
-        addVideoStream(video, userVideoStream);
-        setInterval(record_and_send(userStream), 5000);
+        addVideoStream(video, userVideoStream);        
       });
     });
 
@@ -111,8 +112,9 @@ const connectToNewUser = (userId, stream) => {
   });
 };
 
-function record_and_send(stream) {
-  const recorder = new MediaRecorder(stream);
+function record_and_send() {
+  console.log("Record Called");
+  const recorder = new MediaRecorder(selfStream);
   const chunks = [];
   recorder.ondataavailable = e => chunks.push(e.data);
   recorder.onstop = e => download(new Blob(chunks));
@@ -122,7 +124,16 @@ function record_and_send(stream) {
 
 
 function download(blob){
-  
+  console.log("Download Called");
+  const url = URL.createObjectURL(new Blob([blob], { type: 'video/webm' }));
+        console.log(url);
+        let a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "local.webm";
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);  
 }
 
 function startRecording(){
