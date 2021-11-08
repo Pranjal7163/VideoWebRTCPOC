@@ -246,7 +246,7 @@ const addVideoStream = (video, stream) => {
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
     video.play();
-    video.muted = true
+    // video.muted = true
     videoGrid.append(video);
   });
 };
