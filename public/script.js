@@ -33,13 +33,11 @@ showChat.addEventListener("click", () => {
 
 const user = makeid(6);
 
-var peer = new Peer({
-  config: {'iceServers': [
-    { url: 'stun:18.134.127.127:3478' },
-    { url: 'turn:18.134.127.127:3478', credential: 'amx123', username: 'amxdev'}
-  ]} /* Sample servers, please use appropriate ones */
+var peer = new Peer(undefined, {
+  path: "/peerjs",
+  host: "/",
+  port: "443",
 });
-
 
 let myVideoStream;
 navigator.mediaDevices
