@@ -57,8 +57,9 @@ io.on("connection", (socket) => {
     socket.to(roomId).broadcast.emit("user-disconnected", userId);
   });
 
-  socket.on("join-room", (roomId, userId, userName) => {
-    console.log("room-id"+roomId);
+  socket.on("join-room", (roomId, userId, userName,param) => {
+    console.log("room-id outside "+roomId);
+    console.log("param "+param);
     socket.join(roomId);
     socket.to(roomId).broadcast.emit("user-connected", userId);
     socket.on('disconnect', function(){
@@ -66,7 +67,7 @@ io.on("connection", (socket) => {
       socket.broadcast.to(roomId).emit("user-disconnected", roomId);
   });
     socket.on("message", (message) => {
-      console.log("room-id"+roomId);
+      console.log("room-id on message "+roomId);
       io.to(roomId).emit("createMessage", message, userName);
     });
   });

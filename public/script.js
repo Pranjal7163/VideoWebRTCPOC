@@ -236,7 +236,8 @@ peer.on("open", (id) => {
   var roomIdLocal = ROOM_ID;
   roomId = roomIdLocal;
   console.log("roomId "+roomId);
-  socket.emit("join-room", roomId, id, user);
+  var param = findGetParameter("param");
+  socket.emit("join-room", roomId, id, user,param);
 });
 
 function reset() {
@@ -268,6 +269,7 @@ function makeid(length) {
     result += characters.charAt(Math.floor(Math.random() * 
 charactersLength));
  }
+ console.log("made ID"+result);
  return result;
 }
 
@@ -329,6 +331,19 @@ inviteButton.addEventListener("click", (e) => {
     window.location.href
   );
 });
+
+function findGetParameter(parameterName) {
+  var result = null,
+      tmp = [];
+  location.search
+      .substr(1)
+      .split("&")
+      .forEach(function (item) {
+        tmp = item.split("=");
+        if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+      });
+  return result;
+}
 
 socket.on("createMessage", (message, userName) => {
   if(message == "disconnect"){
