@@ -61,6 +61,7 @@ io.on("connection", (socket) => {
     console.log("room-id outside "+roomId);
     socket.join(roomId);
     setTimeout(function(){
+      console.log(roomId)
       socket.emit(roomId, { userId : userId, identity: identity, type : type});
    }, 4000);
     socket.to(roomId).broadcast.emit("user-connected", userId);
