@@ -235,6 +235,12 @@ peer.on("open", (id) => {
   console.log("myUserID "+id);
   var roomIdLocal = ROOM_ID;
   roomId = roomIdLocal;
+  socket.on(roomId, function(data){
+      if(data.userId != myUserId){
+        console.log(data)
+      }
+    }
+  );
   console.log("roomId "+roomId);
   var param = findGetParameter("param");
   socket.emit("join-room", roomId, id, user,param);

@@ -57,10 +57,12 @@ io.on("connection", (socket) => {
     socket.to(roomId).broadcast.emit("user-disconnected", userId);
   });
 
-  socket.on("join-room", (roomId, userId, userName,param) => {
+  socket.on("join-room", (roomId, userId, userName,identity,type) => {
     console.log("room-id outside "+roomId);
-    console.log("param "+param);
     socket.join(roomId);
+    setTimeout(function(){
+      socket.emit(roomId, { userId : userId, identity: identity, type : type});
+   }, 4000);
     socket.to(roomId).broadcast.emit("user-connected", userId);
     socket.on('disconnect', function(){
       console.log("messageDisconnection");
