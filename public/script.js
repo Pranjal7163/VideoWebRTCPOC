@@ -87,6 +87,9 @@ navigator.mediaDevices
     });
     socket.on("user-ping", (userId) => {
       console.log("PING "+userId);
+      if (userId != myUserId){
+
+      }
     });
 
     socket.on("user-disconnected", (roomIdRecieved)=>{
@@ -117,8 +120,7 @@ const connectToNewUser = (userId, stream) => {
   });
 };
 
-function record_and_send() {
-  console.log("Record Called");
+function record_and_send() {  
   const recorder = new MediaRecorder(selfStream);
   const chunks = [];
   recorder.ondataavailable = e => chunks.push(e.data);
@@ -128,10 +130,8 @@ function record_and_send() {
 }
 
 
-function download(blob){
-  console.log("Download Called");
-  const url = URL.createObjectURL(new Blob([blob], { type: 'video/webm' }));
-        console.log(url);
+function download(blob){  
+  const url = URL.createObjectURL(new Blob([blob], { type: 'video/webm' }));        
         let a = document.createElement("a");
         a.style.display = "none";
         a.href = url;
@@ -152,13 +152,10 @@ function startRecording(){
     });
 
     media_recorder.ondataavailable = function(blob) {
-      // upload each blob to PHP server
-      // uploadToPHPServer(blob);
       var file = new File([blob], 'msr-' + (new Date).toISOString().replace(/:|\./g, '-') + '.webm', {
         type: 'video/webm'
       });
-        const url = URL.createObjectURL(new Blob([blob], { type: 'video/webm' }));
-        console.log(url);
+        const url = URL.createObjectURL(new Blob([blob], { type: 'video/webm' }));        
         let a = document.createElement("a");
         a.style.display = "none";
         a.href = url;
@@ -171,13 +168,6 @@ function startRecording(){
     // event : recording stopped & all blobs sent
     media_recorder.addEventListener('stop', function() {
       console.log("stopped");
-    	// create local object URL from the recorded video blobs
-    	// let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
-    	// download_link.href = video_local;
-      // blobs_recorded.forEach(blob => {
-        // let single_blob_array = [];
-        // single_blob_array.push(blob);        
-      // })
 
     });
 
@@ -185,46 +175,11 @@ function startRecording(){
     console.log("starting");
     media_recorder.start(4000);
     startedRecording = true;
-
-  // var streamsList = [selfStream, userStream];
-  //           const mixer = new MultiStreamsMixer(streamsList);
-  //           mixer.startDrawingFrames();
-  //           const mixedStream = mixer.getMixedStream();
-  //           recorder = RecordRTC(mixedStream, {
-  //               type: "video",
-  //               mimeType: "video/webm",
-  //               previewStream: function (s) {
-                  
-  //               }
-  //             });
-  //             recorder.startRecording();
 }
 
 function downloadFile(){
   console.log("download");
-  media_recorder.stop(); 
-  // const url = URL.createObjectURL(new Blob(blobs_recorded, { type: 'video/webm' }));
-  //       console.log(url);
-  //       let a = document.createElement("a");
-  //       a.style.display = "none";
-  //       a.href = url;
-  //       a.download = "local.webm";
-  //       a.click();
-  //       a.remove();
-  //       URL.revokeObjectURL(url);
-
-  // recorder.stopRecording(() => {
-  //     var blob = recorder.getBlob();
-  //     const url = URL.createObjectURL(blob);
-  //     console.log(url);
-  //     let a = document.createElement("a");
-  //     a.style.display = "none";
-  //     a.href = url;
-  //     a.download = "local.webm";
-  //     a.click();
-  //     a.remove();
-  //     URL.revokeObjectURL(url);        
-  //   });
+  media_recorder.stop();
 };
 
 
