@@ -80,9 +80,13 @@ navigator.mediaDevices
     });
 
     socket.on("user-connected", (userId) => {
+      console.log("user-connected");
       console.log(userId);
       console.log(socket.id);
       connectToNewUser(userId, stream);
+    });
+    socket.on("user-ping", (userId) => {
+      console.log("PING "+userId);
     });
 
     socket.on("user-disconnected", (roomIdRecieved)=>{
@@ -244,7 +248,14 @@ peer.on("open", (id) => {
   console.log("roomId "+roomId);
   var param = findGetParameter("param");
   socket.emit("join-room", roomId, id, user,param);
+  emitPinger();
+  
 });
+
+function emitPinger(){
+  socket.emit("pinger",myUserId);
+  setTimeout(emitPinger,4000);
+}
 
 function reset() {
   videoGrid.forEach((e) => e.parentNode.removeChild(e));

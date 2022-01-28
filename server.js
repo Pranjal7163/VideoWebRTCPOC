@@ -38,10 +38,10 @@ app.get("/agent/:room", (req, res) => {
 io.on("connection", (socket) => {
   console.log("connected");
 
-  setTimeout(function(){
-    console.log("socket timer");
-    console.log(io.sockets.sockets.length);
-  },1000)
+  // setTimeout(function(){
+  //   console.log("socket timer");
+  //   console.log(io.sockets.sockets.length);
+  // },1000)
 
 //   socket.on("disconnect", (reason)=>{
 //     console.log("disconnect");
@@ -59,20 +59,20 @@ io.on("connection", (socket) => {
 
   socket.on("join-room", (roomId, userId, userName,identity,type) => {
     console.log("room-id outside "+roomId);
-    socket.join(roomId);
-    setTimeout(function(){
-      console.log(roomId)
-      socket.emit(roomId, { userId : userId, identity: identity, type : type});
-   }, 4000);
+    socket.join(roomId);    
+    
     socket.to(roomId).broadcast.emit("user-connected", userId);
     socket.on('disconnect', function(){
-      console.log("messageDisconnection");
+      console.log("messageDisconnection "+roomId+" : "+userId);
       socket.broadcast.to(roomId).emit("user-disconnected", roomId);
   });
     socket.on("message", (message) => {
       console.log("room-id on message "+roomId);
       io.to(roomId).emit("createMessage", message, userName);
     });
+    socket.on("pinger",(user_id) => {
+      io.to(roomId).emit("user-ping", userId);
+    })
   });
 });
 
