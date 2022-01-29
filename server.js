@@ -20,7 +20,7 @@ app.get("/", async (req, res) => {
     const request = {
       participantIdType: req.query.participantIdType || "CIVIL_ID",
       participantIdentifier: req.query.participantIdentifier || "280111000088",
-    };
+    }; /* TODO */
     const response = await Api.post("/pub/vc/create-chat-room", request);
     responseData = response.data.results[0];
     console.log("/pub/vc/create-chat-room successful ", {
