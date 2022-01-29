@@ -16,6 +16,8 @@ var roomId = null;
 let media_recorder = null;
 let blobs_recorded = [];
 var startedRecording = false;
+var peerTimeStamp = 0.0;
+var peerUserId = "";
 
 backBtn.addEventListener("click", () => {
   document.querySelector(".main__left").style.display = "flex";
@@ -88,7 +90,8 @@ navigator.mediaDevices
     socket.on("user-ping", (userId) => {
       console.log("PING "+userId);
       if (userId != myUserId){
-
+          peerTimeStamp = new Date().getTime();  
+          peerUserId = userId;        
       }
     });
 
@@ -204,12 +207,28 @@ peer.on("open", (id) => {
   var param = findGetParameter("param");
   socket.emit("join-room", roomId, id, user,param);
   emitPinger();
-  
+  checkPeerTimeout();
 });
 
 function emitPinger(){
   socket.emit("pinger",myUserId);
   setTimeout(emitPinger,4000);
+}
+
+function checkPeerTimeout(){
+  if (peerTimeStamp != 0.0 ){
+    var timeDiff = new Date().getTime() - peerTimeStamp.getTime();
+    var secondsDifference = Math.floor(timeDiff/1000);
+  }
+  if (secondsDifference < 10){
+    setTimeout(checkPeerTimeout,10);
+  }else{
+    makePeerDisconnectionApiCall()
+  }
+}
+
+function makePeerDisconnectionApiCall(){
+    //TODO Add Peer disconnection api using peerUserId variable
 }
 
 function reset() {
