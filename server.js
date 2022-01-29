@@ -66,17 +66,6 @@ console.log("socket :: instance ");
 io.on("connection", (socket) => {
   console.log("socket :: connection ");
 
-  // socket.on("disconnect", (reason) => {
-  //   console.log("disconnect");
-  //   socket.broadcast.emit("user-disconnected");
-  // });
-
-  // socket.on("disconnect", (roomId) => {
-  //   console.log("disconnect");
-  //   console.log("room-id" + roomId);
-  //   console.log(socket.id);
-  // });
-
   socket.on("leave-room", (roomId, userId) => {
     console.log("socket :: leave-room ", { roomId, userId });
 
@@ -102,6 +91,7 @@ io.on("connection", (socket) => {
       // socket.broadcast.to(roomId).emit("createMessage", message, userName);
       io.to(roomId).emit("createMessage", message, userName);
     });
+    
     socket.on("pinger",(user_id) => {
       io.to(roomId).emit("user-ping", userId);
     })
