@@ -30,24 +30,20 @@ var peerTimeStamp = 0.0;
 var peerUserId = "";
 const user = makeid(6);
 let myVideoStream;
-// var peer = new Peer(undefined, {
-//   path: "/peerjs",
-//   host: "/",
-//   port: "3030",
-//   config: {
-//     iceServers: [
-//       { url: "stun:18.134.127.127:3478" },
-//       {
-//         url: "turn:18.134.127.127:3478",
-//         credential: "amx123",
-//         username: "amxdev",
-//       },
-//     ],
-//   },
-// });
-
-var peer = new Peer( "someid",{
-  host: 'peerjs-amx.herokuapp.com'
+var peer = new Peer(undefined, {
+  path: "/peerjs",
+  host: "/",
+  port: "3030",
+  config: {
+    iceServers: [
+      { url: "stun:18.134.127.127:3478" },
+      {
+        url: "turn:18.134.127.127:3478",
+        credential: "amx123",
+        username: "amxdev",
+      },
+    ],
+  },
 });
 
 /**
