@@ -151,7 +151,7 @@ navigator.mediaDevices
       console.log("user-connected");
       console.log(userId);
       console.log(socket.id);
-      connectToNewUser(userId, stream);
+      setTimeout(connectToNewUser,1000,userId,stream);
     });
 
     // ????
