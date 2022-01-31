@@ -46,11 +46,8 @@ let myVideoStream;
 //   },
 // });
 
-var peer = new Peer( {
-  secure:true,
-  host: 'peerjs-amx.herokuapp.com',
-  port: "",
-  path: "/peerjs"
+var peer = new Peer( "someid",{
+  host: 'peerjs-amx.herokuapp.com'
 });
 
 /**
