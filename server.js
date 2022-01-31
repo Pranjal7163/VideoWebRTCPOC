@@ -49,9 +49,9 @@ app.get("/:room", (req, res) => {
   });
 });
 
-app.get("/agent/:room", (req, res) => {
-  res.render("agent", { roomId: req.params.room ,authToken : req.params.authToken});
-});
+// app.get("/agent/:room", (req, res) => {
+//   res.render("agent", { roomId: req.params.room ,authToken : req.params.authToken});
+// });
 
 const io = require("socket.io")(server, {
   cors: {
@@ -82,13 +82,13 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", function (data) {
       console.log("socket :: disconnect ", { data, roomId });
-      socket.broadcast.to(roomId).emit("user-disconnected", roomId);
+
+      io.to(roomId).emit("user-disconnected", roomId);
     });
 
     socket.on("message", (message) => {
       console.log("socket :: message ", { message, roomId });
 
-      // socket.broadcast.to(roomId).emit("createMessage", message, userName);
       io.to(roomId).emit("createMessage", message, userName);
     });
     
@@ -98,6 +98,7 @@ io.on("connection", (socket) => {
 
     socket.on("auth-token",(authToken) => {
       console.log("socket :: authToken",authToken);
+      
       io.to(roomId).emit("room-auth", authToken);
     })
   });

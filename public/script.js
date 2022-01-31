@@ -1,17 +1,17 @@
 /**
  * dom elements
  */
-const videoGrid = document.getElementById("video-grid");
-const myVideo = document.querySelector(".newvideo");
-const showChat = document.querySelector("#showChat");
-const backBtn = document.querySelector(".header__back");
-const endCall = document.getElementById("endCall");
-let text = document.querySelector("#chat_message");
-let send = document.getElementById("send");
-let messages = document.querySelector(".messages");
-const inviteButton = document.querySelector("#inviteButton");
-const muteButton = document.querySelector("#muteButton");
-const stopVideo = document.querySelector("#stopVideo");
+const videoGrid_element = document.getElementById("video-grid");
+const myVideo_element = document.querySelector(".newvideo");
+const showChat_element = document.querySelector("#showChat");
+const backBtn_element = document.querySelector(".header__back");
+const endCall_element = document.getElementById("endCall");
+const text_element = document.querySelector("#chat_message");
+const send_element = document.getElementById("send");
+const messages_element = document.querySelector(".messages");
+const inviteButton_element = document.querySelector("#inviteButton");
+const muteButton_element = document.querySelector("#muteButton");
+const stopVideo_element = document.querySelector("#stopVideo");
 
 /**
  * global variables
@@ -23,7 +23,6 @@ let recorder = null;
 var myUserId = null;
 var roomId = null;
 var authToken = null;
-
 let media_recorder = null;
 let blobs_recorded = [];
 var startedRecording = false;
@@ -35,39 +34,46 @@ var peer = new Peer(undefined, {
   path: "/peerjs",
   host: "/",
   port: "3030",
-  config: {'iceServers': [
-    { url: 'stun:18.134.127.127:3478' },
-    { url: 'turn:18.134.127.127:3478', credential: 'amx123', username : 'amxdev' }
-  ]}
-  });
+  config: {
+    iceServers: [
+      { url: "stun:18.134.127.127:3478" },
+      {
+        url: "turn:18.134.127.127:3478",
+        credential: "amx123",
+        username: "amxdev",
+      },
+    ],
+  },
+});
 
 /**
  * set defaults
  */
-myVideo.muted = true;
+myVideo_element.muted = true;
 
 /**
  * load plugins
  */
- peer.on("open", (id) => {
+peer.on("open", (peer_id) => {
   console.log("OPEN");
-  myUserId = id;
-  console.log("myUserID "+id);
-  var roomIdLocal = ROOM_ID;  
-  roomId = roomIdLocal;
-  socket.on(roomId, function(data){
-      if(data.userId != myUserId){
-        console.log(data)
-      }
-    }
-  );
-  console.log("roomId "+roomId);
-  var param = findGetParameter("param");
-  socket.emit("join-room", roomId, id, user,param);
-  
+  myUserId = peer_id;
+  console.log("myUserID " + peer_id);
+
+  roomId = ROOM_ID;
+
+  // socket.on(roomId, function(data){
+  //     if(data.userId != myUserId){
+  //       console.log(data)
+  //     }
+  //   }
+  // );
+
+  console.log("roomId " + roomId);
+  socket.emit("join-room", roomId, peer_id, user);
+
   emitPinger();
-  
-  setTimeout(initTimeoutCheck,1000);  
+
+  setTimeout(initTimeoutCheck, 1000);
 });
 
 /**
@@ -86,8 +92,10 @@ navigator.mediaDevices
     selfStream = stream;
 
     // show the captured stream on UI.
-    addVideoStreamWithoutGrid(myVideo, stream);
+    addVideoStreamWithoutGrid(myVideo_element, stream);
     // setInterval(record_and_send, 5000);  Commented for testing
+
+    // on receive call
     peer.on("call", (call) => {
       call.answer(stream);
       const video = document.createElement("video");
@@ -98,8 +106,9 @@ navigator.mediaDevices
       });
     });
 
-    peer.on('disconnected', function (data) {
-      console.log('peer :: disconnection', {data : data});
+    // ????
+    peer.on("disconnected", function (data) {
+      console.log("peer :: disconnection", { data: data });
     });
 
     // ????
@@ -134,120 +143,121 @@ navigator.mediaDevices
       }
     });
 
-    socket.on("room-auth", (authTokenLocal) =>{
-        if(authTokenLocal != null){
-          console.log("room :: auth",{authToken : authTokenLocal});
-          authToken = authTokenLocal;
-        }
+    socket.on("room-auth", (authTokenLocal) => {
+      if (authTokenLocal != null) {
+        console.log("room :: auth", { authToken: authTokenLocal });
+        authToken = authTokenLocal;
+      }
     });
 
-    socket.on("user-disconnected", (roomIdRecieved)=>{
+    socket.on("user-disconnected", (roomIdRecieved) => {
       console.log("disconnect-user");
       console.log("Recieved Room ID", roomIdRecieved);
       console.log("My Room ID", roomId);
       if (roomIdRecieved == roomId) {
-        location.href = "/close/done";
+        // location.href = "/close/done";
+        publishUserStatusToServices("PARTICIPANT_LEFT", {});
       }
     });
 
     // ????
-    socket.on("createMessage", (message, userName) => {
-      if (message == "disconnect") {
-        prompt("Disconnected");
-      }
-      messages.innerHTML =
-        messages.innerHTML +
-        `<div class="message">
-             <b><i class="far fa-user-circle"></i> <span> ${
-               userName === user ? "me" : userName
-             }</span> </b>
-             <span>${message}</span>
-         </div>`;
-    });
+    // socket.on("createMessage", (message, userName) => {
+    //   if (message == "disconnect") {
+    //     prompt("Disconnected");
+    //   }
+    //   messages_element.innerHTML =
+    //     messages_element.innerHTML +
+    //     `<div class="message">
+    //          <b><i class="far fa-user-circle"></i> <span> ${
+    //            userName === user ? "me" : userName
+    //          }</span> </b>
+    //          <span>${message}</span>
+    //      </div>`;
+    // });
 
     // on tab close or navigate away from current tab.
-    window.addEventListener(
-      "beforeunload",
-      function () {
-        // ????
-        socket.emit("message", myUserId);
-      },
-      false
-    );
+    // window.addEventListener(
+    //   "beforeunload",
+    //   function () {
+    //     // ????
+    //     socket.emit("message", myUserId);
+    //   },
+    //   false
+    // );
   });
 
 /**
  * load listeners
  */
-backBtn.addEventListener("click", () => {
-  document.querySelector(".main__left").style.display = "flex";
-  document.querySelector(".main__left").style.flex = "1";
-  document.querySelector(".main__right").style.display = "none";
-  document.querySelector(".header__back").style.display = "none";
-});
+// backBtn_element.addEventListener("click", () => {
+//   document.querySelector(".main__left").style.display = "flex";
+//   document.querySelector(".main__left").style.flex = "1";
+//   document.querySelector(".main__right").style.display = "none";
+//   document.querySelector(".header__back").style.display = "none";
+// });
 
-showChat.addEventListener("click", () => {
-  document.querySelector(".main__right").style.display = "flex";
-  document.querySelector(".main__right").style.flex = "1";
-  document.querySelector(".main__left").style.display = "none";
-  document.querySelector(".header__back").style.display = "block";
-});
+// showChat_element.addEventListener("click", () => {
+//   document.querySelector(".main__right").style.display = "flex";
+//   document.querySelector(".main__right").style.flex = "1";
+//   document.querySelector(".main__left").style.display = "none";
+//   document.querySelector(".header__back").style.display = "block";
+// });
 
-endCall.onclick = async () => {
+endCall_element.onclick = async () => {
   console.log("hangupCalled");
   media_recorder.stop();
 };
 
-send.addEventListener("click", (e) => {
-  if (text.value.length !== 0) {
-    socket.emit("message", text.value);
-    text.value = "";
-  }
-});
+// send_element.addEventListener("click", (e) => {
+//   if (text_element.value.length !== 0) {
+//     socket.emit("message", text_element.value);
+//     text_element.value = "";
+//   }
+// });
 
-text.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && text.value.length !== 0) {
-    socket.emit("message", text.value);
-    text.value = "";
-  }
-});
+// text_element.addEventListener("keydown", (e) => {
+//   if (e.key === "Enter" && text_element.value.length !== 0) {
+//     socket.emit("message", text_element.value);
+//     text_element.value = "";
+//   }
+// });
 
-muteButton.addEventListener("click", () => {
-  const enabled = myVideoStream.getAudioTracks()[0].enabled;
-  if (enabled) {
-    myVideoStream.getAudioTracks()[0].enabled = false;
-    html = `<i class="fas fa-microphone-slash"></i>`;
-    muteButton.classList.toggle("background__red");
-    muteButton.innerHTML = html;
-  } else {
-    myVideoStream.getAudioTracks()[0].enabled = true;
-    html = `<i class="fas fa-microphone"></i>`;
-    muteButton.classList.toggle("background__red");
-    muteButton.innerHTML = html;
-  }
-});
+// muteButton_element.addEventListener("click", () => {
+//   const enabled = myVideoStream.getAudioTracks()[0].enabled;
+//   if (enabled) {
+//     myVideoStream.getAudioTracks()[0].enabled = false;
+//     html = `<i class="fas fa-microphone-slash"></i>`;
+//     muteButton_element.classList.toggle("background__red");
+//     muteButton_element.innerHTML = html;
+//   } else {
+//     myVideoStream.getAudioTracks()[0].enabled = true;
+//     html = `<i class="fas fa-microphone"></i>`;
+//     muteButton_element.classList.toggle("background__red");
+//     muteButton_element.innerHTML = html;
+//   }
+// });
 
-stopVideo.addEventListener("click", () => {
-  const enabled = myVideoStream.getVideoTracks()[0].enabled;
-  if (enabled) {
-    myVideoStream.getVideoTracks()[0].enabled = false;
-    html = `<i class="fas fa-video-slash"></i>`;
-    stopVideo.classList.toggle("background__red");
-    stopVideo.innerHTML = html;
-  } else {
-    myVideoStream.getVideoTracks()[0].enabled = true;
-    html = `<i class="fas fa-video"></i>`;
-    stopVideo.classList.toggle("background__red");
-    stopVideo.innerHTML = html;
-  }
-});
+// stopVideo_element.addEventListener("click", () => {
+//   const enabled = myVideoStream.getVideoTracks()[0].enabled;
+//   if (enabled) {
+//     myVideoStream.getVideoTracks()[0].enabled = false;
+//     html = `<i class="fas fa-video-slash"></i>`;
+//     stopVideo_element.classList.toggle("background__red");
+//     stopVideo_element.innerHTML = html;
+//   } else {
+//     myVideoStream.getVideoTracks()[0].enabled = true;
+//     html = `<i class="fas fa-video"></i>`;
+//     stopVideo_element.classList.toggle("background__red");
+//     stopVideo_element.innerHTML = html;
+//   }
+// });
 
-inviteButton.addEventListener("click", (e) => {
-  prompt(
-    "Copy this link and send it to people you want to meet with",
-    window.location.href
-  );
-});
+// inviteButton_element.addEventListener("click", (e) => {
+//   prompt(
+//     "Copy this link and send it to people you want to meet with",
+//     window.location.href
+//   );
+// });
 
 /**
  * Methods
@@ -257,118 +267,105 @@ const connectToNewUser = (userId, stream) => {
   const call = peer.call(userId, stream);
   const video = document.createElement("video");
   video.className = "addvideo";
+  // steam of end user
   call.on("stream", (userVideoStream) => {
     userStream = userVideoStream;
     addVideoStream(video, userVideoStream);
   });
 };
 
-function record_and_send() {
-  const recorder = new MediaRecorder(selfStream);
-  const chunks = [];
-  recorder.ondataavailable = (e) => chunks.push(e.data);
-  recorder.onstop = (e) => download(new Blob(chunks));
-  setTimeout(() => recorder.stop(), 5000); // we'll have a 5s media file
-  recorder.start();
-}
+// function record_and_send() {
+//   const recorder = new MediaRecorder(selfStream);
+//   const chunks = [];
+//   recorder.ondataavailable = (e) => chunks.push(e.data);
+//   recorder.onstop = (e) => download(new Blob(chunks));
+//   setTimeout(() => recorder.stop(), 5000); // we'll have a 5s media file
+//   recorder.start();
+// }
 
-function download(blob) {
-  const url = URL.createObjectURL(new Blob([blob], { type: "video/webm" }));
-  let a = document.createElement("a");
-  a.style.display = "none";
-  a.href = url;
-  a.download = "local.webm";
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
+// function download(blob) {
+//   const url = URL.createObjectURL(new Blob([blob], { type: "video/webm" }));
+//   let a = document.createElement("a");
+//   a.style.display = "none";
+//   a.href = url;
+//   a.download = "local.webm";
+//   a.click();
+//   a.remove();
+//   URL.revokeObjectURL(url);
+// }
 
-function startRecording() {
-  blobs_recorded = [];
-  media_recorder = new MediaRecorder(selfStream, { mimeType: "video/webm" });
+// function startRecording() {
+//   blobs_recorded = [];
+//   media_recorder = new MediaRecorder(selfStream, { mimeType: "video/webm" });
 
-  // event : new recorded video blob available
-  media_recorder.addEventListener("dataavailable", function (e) {
-    console.log("blob recieved");
-    blobs_recorded.push(e.data);
-  });
+//   // event : new recorded video blob available
+//   media_recorder.addEventListener("dataavailable", function (e) {
+//     console.log("blob recieved");
+//     blobs_recorded.push(e.data);
+//   });
 
-  media_recorder.ondataavailable = function (blob) {
-    var file = new File(
-      [blob],
-      "msr-" + new Date().toISOString().replace(/:|\./g, "-") + ".webm",
-      {
-        type: "video/webm",
-      }
-    );
-    const url = URL.createObjectURL(new Blob([blob], { type: "video/webm" }));
-    let a = document.createElement("a");
-    a.style.display = "none";
-    a.href = url;
-    a.download = "local.webm";
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
+//   media_recorder.ondataavailable = function (blob) {
+//     var file = new File(
+//       [blob],
+//       "msr-" + new Date().toISOString().replace(/:|\./g, "-") + ".webm",
+//       {
+//         type: "video/webm",
+//       }
+//     );
+//     const url = URL.createObjectURL(new Blob([blob], { type: "video/webm" }));
+//     let a = document.createElement("a");
+//     a.style.display = "none";
+//     a.href = url;
+//     a.download = "local.webm";
+//     a.click();
+//     a.remove();
+//     URL.revokeObjectURL(url);
+//   };
 
-  // event : recording stopped & all blobs sent
-  media_recorder.addEventListener("stop", function () {
-    console.log("stopped");
-  });
+//   // event : recording stopped & all blobs sent
+//   media_recorder.addEventListener("stop", function () {
+//     console.log("stopped");
+//   });
 
-  // start recording with each recorded blob having 1 second video
-  console.log("starting");
-  media_recorder.start(4000);
-  startedRecording = true;
-}
+//   // start recording with each recorded blob having 1 second video
+//   console.log("starting");
+//   media_recorder.start(4000);
+//   startedRecording = true;
+// }
 
-function downloadFile(){
-  console.log("download");
-  media_recorder.stop();
-};
-
-
-endCall.onclick = async () => {
-  console.log('hangupCalled');  
-  downloadFile();
-};
-
-
-
-function emitPinger(){
-  socket.emit("pinger",myUserId);
+function emitPinger() {
+  socket.emit("pinger", myUserId);
   checkPeerTimeout();
-  if (AUTH_TOKEN != null){
-    console.log("pinger :: authToken" , {authToken : AUTH_TOKEN});
+  if (AUTH_TOKEN != null) {
+    console.log("pinger :: authToken", { authToken: AUTH_TOKEN });
     var authTokenLocal = AUTH_TOKEN;
     authToken = authTokenLocal;
-    socket.emit("auth-token",authToken);
+    socket.emit("auth-token", authToken);
   }
-  setTimeout(emitPinger,4000);
+  setTimeout(emitPinger, 4000);
 }
 
-function initTimeoutCheck(){
-  console.log("timout :: init",{start : peerTimeStamp});
-  if(peerTimeStamp != 0.0){
+function initTimeoutCheck() {
+  console.log("timout :: init", { start: peerTimeStamp });
+  if (peerTimeStamp != 0.0) {
     checkPeerTimeout();
   }
 }
 
-function checkPeerTimeout(){
-  console.log("timeout :: client",{start : peerTimeStamp});
-  if (peerTimeStamp != 0.0 ){
+function checkPeerTimeout() {
+  console.log("timeout :: client", { start: peerTimeStamp });
+  if (peerTimeStamp != 0.0) {
     var timeDiff = new Date().getTime() - peerTimeStamp;
-    var secondsDifference = Math.floor(timeDiff/1000);
-    console.log("timeout :: client",{diff : secondsDifference});
-    if (secondsDifference < 10){
-      console.log("peer live")
-    }else{
-      makePeerDisconnectionApiCall()
+    var secondsDifference = Math.floor(timeDiff / 1000);
+    console.log("timeout :: client", { diff: secondsDifference });
+    if (secondsDifference < 10) {
+      console.log("peer live");
+    } else {
+      makePeerDisconnectionApiCall();
     }
   }
-
 }
-  
+
 function emitPinger() {
   socket.emit("pinger", myUserId);
   setTimeout(emitPinger, 4000);
@@ -388,18 +385,19 @@ function checkPeerTimeout() {
 
 function makePeerDisconnectionApiCall() {
   //TODO Add Peer disconnection api using peerUserId variable
+  publishUserStatusToServices("PARTICIPANT_DISCONNECTED", {}); // need data to post to API
 }
 
-function reset() {
-  videoGrid.forEach((e) => e.parentNode.removeChild(e));
-}
+// function reset() {
+//   videoGrid_element.forEach((e) => e.parentNode.removeChild(e));
+// }
 
 const addVideoStream = (video, stream) => {
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
     video.play();
     // video.muted = true
-    videoGrid.append(video);
+    videoGrid_element.append(video);
   });
 };
 
@@ -407,7 +405,7 @@ const addVideoStreamWithoutGrid = (video, stream) => {
   video.srcObject = stream;
   video.addEventListener("loadedmetadata", () => {
     video.play();
-    // videoGrid.append(video);
+    // videoGrid_element.append(video);
   });
 };
 
@@ -461,7 +459,7 @@ async function makeAjaxCall(method, url, request = {}, options = {}) {
 }
 
 async function publishUserStatusToServices(
-  status = "", // "PARTICIPANT_JOINED" || "PARTICIPANT_DISCONNECTED"
+  status = "", // "PARTICIPANT_JOINED" || "PARTICIPANT_LEFT" || "PARTICIPANT_DISCONNECTED"
   data = {}
 ) {
   let {
