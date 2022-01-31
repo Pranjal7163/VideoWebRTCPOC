@@ -368,23 +368,6 @@ function checkPeerTimeout(){
   }
 
 }
-  
-function emitPinger() {
-  socket.emit("pinger", myUserId);
-  setTimeout(emitPinger, 4000);
-}
-
-function checkPeerTimeout() {
-  if (peerTimeStamp != 0.0) {
-    var timeDiff = new Date().getTime() - peerTimeStamp.getTime();
-    var secondsDifference = Math.floor(timeDiff / 1000);
-  }
-  if (secondsDifference < 10) {
-    setTimeout(checkPeerTimeout, 10);
-  } else {
-    makePeerDisconnectionApiCall();
-  }
-}
 
 function makePeerDisconnectionApiCall() {
   //TODO Add Peer disconnection api using peerUserId variable
