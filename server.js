@@ -8,10 +8,16 @@ app.use(express.static("public"));
 
 app.set("view engine", "ejs");
 
-const { ExpressPeerServer } = require("peer");
-const peerServer = ExpressPeerServer(server, {
+// const { ExpressPeerServer } = require("peer");
+var ExpressPeerServer = require("peer").ExpressPeerServer;    
+var options = {
   debug: true,
-});
+  allow_discovery: true,
+};
+let peerServer = ExpressPeerServer(server, options);
+// const peerServer = ExpressPeerServer(server, {
+//   debug: true,
+// });
 app.use("/peerjs", peerServer);
 
 app.get("/", async (req, res) => {
@@ -103,5 +109,5 @@ io.on("connection", (socket) => {
     })
   });
 });
-
-server.listen(process.env.PORT || 3030);
+const PORT = process.env.PORT || 3030;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
