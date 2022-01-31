@@ -12,6 +12,7 @@ myVideo.muted = true;
 
 var myUserId = null;
 var roomId = null;
+var authToken = null;
 
 let media_recorder = null;
 let blobs_recorded = [];
@@ -35,12 +36,22 @@ showChat.addEventListener("click", () => {
 
 const user = makeid(6);
 
-var peer = new Peer({
+// var peer = new Peer({
+//   config: {'iceServers': [
+//     { url: 'stun:18.134.127.127:3478' },
+//     { url: 'turn:18.134.127.127:3478', credential: 'amx123', username : 'amxdev' }
+//   ]} /* Sample servers, please use appropriate ones */
+// });
+
+var peer = new Peer(undefined, {
+  path: "/peerjs",
+  host: "/",
+  port: "3030",
   config: {'iceServers': [
     { url: 'stun:18.134.127.127:3478' },
     { url: 'turn:18.134.127.127:3478', credential: 'amx123', username : 'amxdev' }
-  ]} /* Sample servers, please use appropriate ones */
-});
+  ]}
+  });
 
 let myVideoStream;
 navigator.mediaDevices
@@ -55,7 +66,7 @@ navigator.mediaDevices
     selfStream = stream;
     
     addVideoStreamWithoutGrid(myVideo, stream);
-    setInterval(record_and_send, 5000);
+    // setInterval(record_and_send, 5000);  Commented for testing
     peer.on("call", (call) => {
       call.answer(stream);
       const video = document.createElement("video");
@@ -66,8 +77,8 @@ navigator.mediaDevices
       });
     });
 
-    peer.on('disconnected', function () {
-      console.log('Connection lost. Please reconnect');
+    peer.on('disconnected', function (data) {
+      console.log('peer :: disconnection', {data : data});
     });
     peer.on('close', function () {      
         console.log('Connection destroyed');
@@ -93,6 +104,13 @@ navigator.mediaDevices
           peerTimeStamp = new Date().getTime();  
           peerUserId = userId;        
       }
+    });
+
+    socket.on("room-auth", (authTokenLocal) =>{
+        if(authTokenLocal != null){
+          console.log("room :: auth",{authToken : authTokenLocal});
+          authToken = authTokenLocal;
+        }
     });
 
     socket.on("user-disconnected", (roomIdRecieved)=>{
@@ -195,7 +213,7 @@ peer.on("open", (id) => {
   console.log("OPEN");
   myUserId = id;
   console.log("myUserID "+id);
-  var roomIdLocal = ROOM_ID;
+  var roomIdLocal = ROOM_ID;  
   roomId = roomIdLocal;
   socket.on(roomId, function(data){
       if(data.userId != myUserId){
@@ -206,25 +224,44 @@ peer.on("open", (id) => {
   console.log("roomId "+roomId);
   var param = findGetParameter("param");
   socket.emit("join-room", roomId, id, user,param);
+  
   emitPinger();
-  checkPeerTimeout();
+  
+  setTimeout(initTimeoutCheck,1000);  
 });
 
 function emitPinger(){
   socket.emit("pinger",myUserId);
+  checkPeerTimeout();
+  if (AUTH_TOKEN != null){
+    console.log("pinger :: authToken" , {authToken : AUTH_TOKEN});
+    var authTokenLocal = AUTH_TOKEN;
+    authToken = authTokenLocal;
+    socket.emit("auth-token",authToken);
+  }
   setTimeout(emitPinger,4000);
 }
 
+function initTimeoutCheck(){
+  console.log("timout :: init",{start : peerTimeStamp});
+  if(peerTimeStamp != 0.0){
+    checkPeerTimeout();
+  }
+}
+
 function checkPeerTimeout(){
+  console.log("timeout :: client",{start : peerTimeStamp});
   if (peerTimeStamp != 0.0 ){
-    var timeDiff = new Date().getTime() - peerTimeStamp.getTime();
+    var timeDiff = new Date().getTime() - peerTimeStamp;
     var secondsDifference = Math.floor(timeDiff/1000);
+    console.log("timeout :: client",{diff : secondsDifference});
+    if (secondsDifference < 10){
+      console.log("peer live")
+    }else{
+      makePeerDisconnectionApiCall()
+    }
   }
-  if (secondsDifference < 10){
-    setTimeout(checkPeerTimeout,10);
-  }else{
-    makePeerDisconnectionApiCall()
-  }
+  
 }
 
 function makePeerDisconnectionApiCall(){

@@ -50,7 +50,7 @@ app.get("/:room", (req, res) => {
 });
 
 app.get("/agent/:room", (req, res) => {
-  res.render("agent", { roomId: req.params.room });
+  res.render("agent", { roomId: req.params.room ,authToken : req.params.authToken});
 });
 
 const io = require("socket.io")(server, {
@@ -89,7 +89,7 @@ io.on("connection", (socket) => {
 
     socket.join(roomId);
 
-    socket.to(roomId).broadcast.emit("user-connected", userId);
+    io.to(roomId).emit("user-connected", userId);
 
     socket.on("disconnect", function (data) {
       console.log("socket :: disconnect ", { data, roomId });
@@ -104,6 +104,11 @@ io.on("connection", (socket) => {
     });
     socket.on("pinger",(user_id) => {
       io.to(roomId).emit("user-ping", userId);
+    })
+
+    socket.on("auth-token",(authToken) => {
+      console.log("socket :: authToken",authToken);
+      io.to(roomId).emit("room-auth", authToken);
     })
   });
 });
