@@ -8,17 +8,17 @@ app.use(express.static("public"));
 
 app.set("view engine", "ejs");
 
-// const { ExpressPeerServer } = require("peer");
-var ExpressPeerServer = require("peer").ExpressPeerServer;    
-var options = {
-  debug: true,
-  allow_discovery: true,
-};
-let peerServer = ExpressPeerServer(server, options);
-// const peerServer = ExpressPeerServer(server, {
+// // const { ExpressPeerServer } = require("peer");
+// var ExpressPeerServer = require("peer").ExpressPeerServer;    
+// var options = {
 //   debug: true,
-// });
-app.use("/peerjs", peerServer);
+//   allow_discovery: true,
+// };
+// let peerServer = ExpressPeerServer(server, options);
+// // const peerServer = ExpressPeerServer(server, {
+// //   debug: true,
+// // });
+// app.use("/peerjs", peerServer);
 
 app.get("/", async (req, res) => {
   let responseData;

@@ -30,26 +30,34 @@ var peerTimeStamp = 0.0;
 var peerUserId = "";
 const user = makeid(6);
 let myVideoStream;
+
+
+// const peer = new Peer();
+
+
+var peer = new Peer({
+  config: {
+    iceServers: [
+      { url: "stun:18.134.127.127:3478" },
+      {
+        url: "turn:18.134.127.127:3478",
+        credential: "amx123",
+        username: "amxdev",
+      },
+    ],
+  },
+});
+
 // var peer = new Peer(undefined, {
 //   path: "/peerjs",
 //   host: "/",
-//   port: "3030",
-//   config: {
-//     iceServers: [
-//       { url: "stun:18.134.127.127:3478" },
-//       {
-//         url: "turn:18.134.127.127:3478",
-//         credential: "amx123",
-//         username: "amxdev",
-//       },
-//     ],
-//   },
+//   port: "443",
 // });
 
-var peer = new Peer( "someid",{
-  secure:true,
-  host: 'peerjs-amx.herokuapp.com'
-});
+// var peer = new Peer( "someid",{
+//   secure:true,
+//   host: 'peerjs-amx.herokuapp.com'
+// });
 
 /**
  * set defaults
@@ -59,8 +67,13 @@ myVideo_element.muted = true;
 /**
  * load plugins
  */
+
+ peer.on('error', function(err) { 
+   console.log("peer :: error", {error : err});
+  });
 peer.on("open", (peer_id) => {
   console.log("OPEN");
+  
   myUserId = peer_id;
   console.log("myUserID " + peer_id);
 
@@ -80,6 +93,8 @@ peer.on("open", (peer_id) => {
 
   setTimeout(initTimeoutCheck, 1000);
 });
+
+
 
 /**
  * start video
