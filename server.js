@@ -8,24 +8,26 @@ app.use(express.static("public"));
 
 app.set("view engine", "ejs");
 
-// // const { ExpressPeerServer } = require("peer");
-// var ExpressPeerServer = require("peer").ExpressPeerServer;    
-// var options = {
+// const { ExpressPeerServer } = require("peer");
+var ExpressPeerServer = require("peer").ExpressPeerServer;    
+var options = {
+  debug: true,
+  allow_discovery: true,
+};
+let peerServer = ExpressPeerServer(server, options);
+// const peerServer = ExpressPeerServer(server, {
 //   debug: true,
-//   allow_discovery: true,
-// };
-// let peerServer = ExpressPeerServer(server, options);
-// // const peerServer = ExpressPeerServer(server, {
-// //   debug: true,
-// // });
-// app.use("/peerjs", peerServer);
+// });
+app.use("/peerjs", peerServer);
 
 app.get("/", async (req, res) => {
   let responseData;
   try {
+    const participantIdType = req.query.participantIdType || "CIVIL_ID";
+    const participantIdentifier = req.query.participantIdentifier || "280111000088";
     const request = {
-      participantIdType: req.query.participantIdType || "CIVIL_ID",
-      participantIdentifier: req.query.participantIdentifier || "280111000088",
+      participantIdType: participantIdType,
+      participantIdentifier: participantIdentifier,
     }; /* TODO */
     const response = await Api.post("/pub/vc/create-chat-room", request);
     responseData = response.data.results[0];
@@ -39,7 +41,7 @@ app.get("/", async (req, res) => {
 
   if (responseData) {
     res.redirect(
-      `/${responseData.roomCode}?authToken=${responseData.authToken}`
+      `/${responseData.roomCode}?authToken=${encodeURIComponent(responseData.authToken)}&participantIdType=${req.query.participantIdType || "CIVIL_ID"}&participantIdentifier=${req.query.participantIdentifier || "280111000088"}`
     );
   } else {
     res.send({
@@ -52,6 +54,8 @@ app.get("/:room", (req, res) => {
   res.render("room", {
     roomId: req.params.room,
     authToken: req.query.authToken,
+    id_type : req.query.participantIdType,
+    identity : req.query.participantIdentifier
   });
 });
 
@@ -102,10 +106,10 @@ io.on("connection", (socket) => {
       io.to(roomId).emit("user-ping", userId);
     })
 
-    socket.on("auth-token",(authToken) => {
+    socket.on("participant-data",(authToken,participantId) => {
       console.log("socket :: authToken",authToken);
-      
-      io.to(roomId).emit("room-auth", authToken);
+      console.log("socket :: particiapntId",participantId);
+      io.to(roomId).emit("room-participant-data", authToken,participantId);
     })
   });
 });

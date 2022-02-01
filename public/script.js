@@ -22,7 +22,7 @@ let userStream = null;
 let recorder = null;
 var myUserId = null;
 var roomId = null;
-var authToken = null;
+
 let media_recorder = null;
 let blobs_recorded = [];
 var startedRecording = false;
@@ -31,22 +31,46 @@ var peerUserId = "";
 const user = makeid(6);
 let myVideoStream;
 
+let amxParticipantId = null;
+let amxPeerParticipantId = null;
+let id_type = null;
+let identity = null;
+var amxAuthToken = null;
 
-// const peer = new Peer();
+var peer;
+
+// const conn = peer.connect('id');
+// conn.on('open', () => {
+//   conn.send('hi!');
+//   console.log('Connected');
+// });
 
 
-var peer = new Peer({
-  config: {
-    iceServers: [
-      { url: "stun:18.134.127.127:3478" },
-      {
-        url: "turn:18.134.127.127:3478",
-        credential: "amx123",
-        username: "amxdev",
-      },
-    ],
-  },
-});
+// var peer = new Peer({
+//   config: {
+//     iceServers: [
+//       { url: "stun:18.134.127.127:3478" },
+//       {
+//         url: "turn:18.134.127.127:3478",
+//         credential: "amx123",
+//         username: "amxdev",
+//       },
+//     ],
+//   },
+// });
+// var peer = new Peer(undefined, {
+
+//   host: 'localhost',
+//   path: '/peerjs',
+//   port: 3001,
+//   secure: true,
+//   key: 'copycat',
+//   debug: true
+// });
+
+// peer.on('open', function(id) {
+//   console.log('My peer ID is: ' + id);
+// });
 
 // var peer = new Peer(undefined, {
 //   path: "/peerjs",
@@ -63,37 +87,6 @@ var peer = new Peer({
  * set defaults
  */
 myVideo_element.muted = true;
-
-/**
- * load plugins
- */
-
- peer.on('error', function(err) { 
-   console.log("peer :: error", {error : err});
-  });
-peer.on("open", (peer_id) => {
-  console.log("OPEN");
-  
-  myUserId = peer_id;
-  console.log("myUserID " + peer_id);
-
-  roomId = ROOM_ID;
-
-  // socket.on(roomId, function(data){
-  //     if(data.userId != myUserId){
-  //       console.log(data)
-  //     }
-  //   }
-  // );
-
-  console.log("roomId " + roomId);
-  socket.emit("join-room", roomId, peer_id, user);
-
-  emitPinger();
-
-  setTimeout(initTimeoutCheck, 1000);
-});
-
 
 
 /**
@@ -114,17 +107,62 @@ navigator.mediaDevices
     // show the captured stream on UI.
     addVideoStreamWithoutGrid(myVideo_element, stream);
     // setInterval(record_and_send, 5000);  Commented for testing
-
+    peer = new Peer({
+      secure : true, 
+      host: "peerjs-amx.herokuapp.com", // TODO Need to add peerjs server in amx env. Peerjs cloud sometimes is down for days, hence moved to heroku
+      config: {
+        iceServers: [
+          { url: "stun:18.134.127.127:3478" },
+            {
+              url: "turn:18.134.127.127:3478",
+              credential: "amx123",
+              username: "amxdev",
+            },
+        ],
+      },
+    });
     // on receive call
     peer.on("call", (call) => {
+      console.log("connect : user : answer")
       call.answer(stream);
       const video = document.createElement("video");
       video.className = "addvideo";
+      
       call.on("stream", (userVideoStream) => {
         userStream = userVideoStream;
         addVideoStream(video, userVideoStream);
       });
     });
+
+    peer.on('error', function(err) { 
+      console.log("peer :: error", {error : err});
+     });
+     
+   peer.on("open", (peer_id) => {
+     console.log("OPEN");
+     
+     myUserId = peer_id;
+     console.log("myUserID " + peer_id);
+   
+     roomId = ROOM_ID;
+     identity = IDENTITY;
+     id_type = ID_TYPE;
+     
+   
+     // socket.on(roomId, function(data){
+     //     if(data.userId != myUserId){
+     //       console.log(data)
+     //     }
+     //   }
+     // );
+   
+     console.log("roomId " + roomId);
+     socket.emit("join-room", roomId, peer_id, user);
+   
+     emitPinger();
+   
+     setTimeout(initTimeoutCheck, 1000);
+   });
 
     // ????
     peer.on("disconnected", function (data) {
@@ -163,10 +201,15 @@ navigator.mediaDevices
       }
     });
 
-    socket.on("room-auth", (authTokenLocal) => {
+    socket.on("room-participant-data", (authTokenLocal,particiapntIdLocal) => {
       if (authTokenLocal != null) {
-        console.log("room :: auth", { authToken: authTokenLocal });
-        authToken = authTokenLocal;
+        console.log("room :: auth", { authToken: authTokenLocal});
+        amxAuthToken = authTokenLocal;
+        console.log("room :: participantId",{ particiapntId : particiapntIdLocal })
+        if(amxParticipantId != particiapntIdLocal){
+          console.log("room :: peer participantId",{ particiapntId : particiapntIdLocal })
+          amxPeerParticipantId = particiapntIdLocal;
+        }
       }
     });
 
@@ -176,7 +219,14 @@ navigator.mediaDevices
       console.log("My Room ID", roomId);
       if (roomIdRecieved == roomId) {
         // location.href = "/close/done";
-        publishUserStatusToServices("PARTICIPANT_LEFT", {});
+        publishUserStatusToServices("PARTICIPANT_LEFT", {
+          displayName : identity,
+          participantIdType : id_type,
+          roomCode : roomId,
+          participantIdentifier : identity,
+          authToken : AUTH_TOKEN,
+          participantId : amxParticipantId
+        });
       }
     });
 
@@ -284,6 +334,15 @@ endCall_element.onclick = async () => {
  */
 // ????
 const connectToNewUser = (userId, stream) => {
+  updateCall("PARTICIPANT_JOINED",{
+    displayName : identity,
+    participantIdType : id_type,
+    roomCode : roomId,
+    participantIdentifier : identity,
+    authToken : AUTH_TOKEN
+  });
+
+  console.log("connect : user : call")
   const call = peer.call(userId, stream);
   const video = document.createElement("video");
   video.className = "addvideo";
@@ -293,6 +352,14 @@ const connectToNewUser = (userId, stream) => {
     addVideoStream(video, userVideoStream);
   });
 };
+
+async function updateCall(){
+  let response = await publishUserStatusToServices("PARTICIPANT_JOINED", data);
+  console.log("connect : user : call",((response['results'])[0])['newParticipantId']);
+  amxParticipantId = ((response['results'])[0])['newParticipantId'];
+}
+
+
 
 // function record_and_send() {
 //   const recorder = new MediaRecorder(selfStream);
@@ -357,10 +424,9 @@ function emitPinger() {
   socket.emit("pinger", myUserId);
   checkPeerTimeout();
   if (AUTH_TOKEN != null) {
-    console.log("pinger :: authToken", { authToken: AUTH_TOKEN });
-    var authTokenLocal = AUTH_TOKEN;
-    authToken = authTokenLocal;
-    socket.emit("auth-token", authToken);
+    console.log("pinger :: authToken", { authToken: AUTH_TOKEN ,peerId : amxParticipantId});
+    amxAuthToken = AUTH_TOKEN;
+    socket.emit("participant-data", AUTH_TOKEN,amxParticipantId);
   }
   setTimeout(emitPinger, 4000);
 }
@@ -388,7 +454,14 @@ function checkPeerTimeout() {
 
 function makePeerDisconnectionApiCall() {
   //TODO Add Peer disconnection api using peerUserId variable
-  publishUserStatusToServices("PARTICIPANT_DISCONNECTED", {}); // need data to post to API
+  publishUserStatusToServices("PARTICIPANT_DISCONNECTED", {
+    displayName : identity,
+    participantIdType : id_type,
+    roomCode : roomId,
+    participantIdentifier : identity,
+    authToken : AUTH_TOKEN,
+    participantId : amxPeerParticipantId
+  }); // need data to post to API
 }
 
 // function reset() {
@@ -463,7 +536,7 @@ async function makeAjaxCall(method, url, request = {}, options = {}) {
 
 async function publishUserStatusToServices(
   status = "", // "PARTICIPANT_JOINED" || "PARTICIPANT_LEFT" || "PARTICIPANT_DISCONNECTED"
-  data = {}
+  data = {},
 ) {
   let {
     authToken = "",
@@ -493,7 +566,9 @@ async function publishUserStatusToServices(
       request
     );
     console.log("publishUserStatusToServices successful ", { response });
+    return response;
   } catch (error) {
     console.error("publishUserStatusToServices failed ", error);
+    throw error;
   }
 }
